@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talk2DB - Natural Language to SQL Converter</title>
+    <meta name="description" content="Convert natural language queries to SQL with AI-powered interface">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6",
+                        secondary: "#1E40AF",
+                        accent: "#10B981"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <!-- Header -->
+    <header class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-database text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">Talk2DB</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors">
+                        <i class="fas fa-history mr-2"></i>Query History
+                    </button>
+                    <button class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-blue-50 transition-colors">
+                        <i class="fas fa-cog mr-2"></i>Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Database Selection Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Database Configuration</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Database Dropdown -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-database mr-2"></i>Select Database
+                    </label>
+                    <select id="databaseSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                        <option value="">Choose a database...</option>
+                        <option value="SALES_DB">SALES_DB</option>
+                        <option value="HR_DB">HR_DB</option>
+                        <option value="INVENTORY_DB">INVENTORY_DB</option>
+                        <option value="CUSTOMER_DB">CUSTOMER_DB</option>
+                    </select>
+                </div>
+                
+                <!-- Table Dropdown -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-table mr-2"></i>Select Table
+                    </label>
+                    <select id="tableSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                        <option value="">Choose a table...</option>
+                        <option value="USERS">USERS</option>
+                        <option value="PRODUCTS">PRODUCTS</option>
+                        <option value="ORDERS">ORDERS</option>
+                        <option value="CUSTOMERS">CUSTOMERS</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div class="flex items-start">
+                    <i class="fas fa-exclamation-circle text-yellow-500 mt-1 mr-3"></i>
+                    <div>
+                        <p class="text-sm text-yellow-800 font-medium">Important Note:</p>
+                        <p class="text-sm text-yellow-700">Please ensure table names and database names are written in CAPITAL LETTERS in your queries.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Query Input Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Natural Language Query</h2>
+            <div class="relative">
+                <textarea 
+                    id="queryInput" 
+                    placeholder="Enter your query in plain English... Example: Show me all customers from New York in the CUSTOMERS table of SALES_DB"
+                    class="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
+                    rows="4"
+                ></textarea>
+                <div class="absolute bottom-4 right-4 flex space-x-2">
+                    <button class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-eraser"></i>
+                    </button>
+                    <button id="submitQuery" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center">
+                        <i class="fas fa-play mr-2"></i>Run Query
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-4 flex items-center text-sm text-gray-600">
+                <i class="fas fa-lightbulb mr-2 text-accent"></i>
+                <span>Tip: Mention table names and database names in CAPS for accurate SQL conversion</span>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">Query Results</h2>
+                <div class="flex space-x-3">
+                    <button class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-download mr-2"></i>Export
+                    </button>
+                    <button class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-chart-bar mr-2"></i>Visualize
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Results Container -->
+            <div id="resultsContainer" class="border border-gray-200 rounded-lg min-h-[400px]">
+                <div class="flex flex-col items-center justify-center h-full py-16 text-gray-400">
+                    <i class="fas fa-search text-4xl mb-4"></i>
+                    <p class="text-lg">Your query results will appear here</p>
+                    <p class="text-sm mt-2">Run a query to see the generated SQL and results</p>
+                </div>
+            </div>
+            
+            <!-- Generated SQL Display -->
+            <div id="sqlContainer" class="mt-6 hidden">
+                <h3 class="text-lg font-medium text-gray-800 mb-3">Generated SQL</h3>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <pre class="text-green-400 text-sm overflow-x-auto" id="generatedSQL"></pre>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-database text-white text-sm"></i>
+                    </div>
+                    <span class="text-gray-600 font-medium">Talk2DB</span>
+                </div>
+                <div class="text-sm text-gray-500">
+                    <p>Convert natural language to SQL queries with AI-powered precision</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample data for demonstration
+        const sampleDatabases = [
+            { "id": "SALES_DB", "name": "SALES_DB", "tables": ["USERS", "PRODUCTS", "ORDERS", "CUSTOMERS"] },
+            { "id": "HR_DB", "name": "HR_DB", "tables": ["EMPLOYEES", "DEPARTMENTS", "SALARIES", "ATTENDANCE"] },
+            { "id": "INVENTORY_DB", "name": "INVENTORY_DB", "tables": ["PRODUCTS", "CATEGORIES", "SUPPLIERS", "STOCK"] },
+            { "id": "CUSTOMER_DB", "name": "CUSTOMER_DB", "tables": ["CUSTOMERS", "ORDERS", "PAYMENTS", "FEEDBACK"] }
+        ];
+
+        const sampleResults = [
+            { "id": 1, "name": "John Doe", "email": "john@example.com", "city": "New York", "status": "Active" },
+            { "id": 2, "name": "Jane Smith", "email": "jane@example.com", "city": "Los Angeles", "status": "Active" },
+            { "id": 3, "name": "Bob Johnson", "email": "bob@example.com", "city": "Chicago", "status": "Inactive" },
+            { "id": 4, "name": "Alice Brown", "email": "alice@example.com", "city": "New York", "status": "Active" }
+        ];
+
+        // DOM Elements
+        const databaseSelect = document.getElementById("databaseSelect");
+        const tableSelect = document.getElementById("tableSelect");
+        const queryInput = document.getElementById("queryInput");
+        const submitButton = document.getElementById("submitQuery");
+        const resultsContainer = document.getElementById("resultsContainer");
+        const sqlContainer = document.getElementById("sqlContainer");
+        const generatedSQL = document.getElementById("generatedSQL");
+
+        // Initialize database dropdown
+        function initializeDatabaseDropdown() {
+            sampleDatabases.forEach(db => {
+                const option = document.createElement("option");
+                option.value = db.id;
+                option.textContent = db.name;
+                databaseSelect.appendChild(option);
+            });
+        }
+
+        // Update table dropdown based on selected database
+        databaseSelect.addEventListener("change", function() {
+            const selectedDb = this.value;
+            tableSelect.innerHTML = '<option value="">Choose a table...</option>';
+            
+            if (selectedDb) {
+                const db = sampleDatabases.find(d => d.id === selectedDb);
+                if (db) {
+                    db.tables.forEach(table => {
+                        const option = document.createElement("option");
+                        option.value = table;
+                        option.textContent = table;
+                        tableSelect.appendChild(option);
+                    });
+                }
+            }
+        });
+
+        // Handle query submission
+        submitButton.addEventListener("click", function() {
+            const query = queryInput.value.trim();
+            const selectedDb = databaseSelect.value;
+            const selectedTable = tableSelect.value;
+            
+            if (!query) {
+                alert("Please enter a query in natural language");
+                return;
+            }
+            
+            if (!selectedDb || !selectedTable) {
+                alert("Please select both a database and a table");
+                return;
+            }
+            
+            processQuery(query, selectedDb, selectedTable);
+        });
+
+        // Process the natural language query
+        function processQuery(query, database, table) {
+            // Show loading state
+            resultsContainer.innerHTML = `
+                <div class="flex items-center justify-center h-40">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <span class="ml-3 text-gray-600">Processing your query...</span>
+                </div>
+            `;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Generate sample SQL based on input
+                const sqlQuery = generateSQLFromNaturalLanguage(query, database, table);
+                
+                // Display generated SQL
+                generatedSQL.textContent = sqlQuery;
+                sqlContainer.classList.remove("hidden");
+                
+                // Display results
+                displayResults(sampleResults);
+            }, 1500);
+        }
+
+        // Generate SQL from natural language (simplified example)
+        function generateSQLFromNaturalLanguage(query, database, table) {
+            let sql = SELECT * FROM ${database}.${table};
+            
+            if (query.toLowerCase().includes("where")) {
+                if (query.toLowerCase().includes("new york")) {
+                    sql += " WHERE city = 'New York'";
+                } else if (query.toLowerCase().includes("active")) {
+                    sql += " WHERE status = 'Active'";
+                }
+            }
+            
+            if (query.toLowerCase().includes("order by")) {
+                sql += " ORDER BY name ASC";
+            }
+            
+            if (query.toLowerCase().includes("limit")) {
+                sql += " LIMIT 10";
+            }
+            
+            return sql;
+        }
+
+        // Display results in a table
+        function displayResults(results) {
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-40 text-gray-400">
+                        <i class="fas fa-inbox text-4xl mb-4"></i>
+                        <p class="text-lg">No results found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const headers = Object.keys(results[0]);
+            
+            let tableHTML = `
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+            `;
+            
+            // Create table headers
+            headers.forEach(header => {
+                tableHTML += <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${header}</th>;
+            });
+            
+            tableHTML += `
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+            `;
+            
+            // Create table rows
+            results.forEach((row, index) => {
+                tableHTML += <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100">;
+                headers.forEach(header => {
+                    tableHTML += <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row[header]}</td>;
+                });
+                tableHTML += </tr>;
+            });
+            
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
+                    <p class="text-sm text-gray-600">Showing ${results.length} results</p>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = tableHTML;
+        }
+
+        // Initialize the application
+        document.addEventListener("DOMContentLoaded", function() {
+            initializeDatabaseDropdown();
+            
+            // Add example query on load
+            queryInput.value = "Show me all active customers from New York in the CUSTOMERS table of SALES_DB";
+        });
+    </script>
+</body>
+</html>
