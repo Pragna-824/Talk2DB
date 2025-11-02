@@ -1,0 +1,22 @@
+/* Talk2DB custom tweaks on top of Tailwind */
+select:focus,
+textarea:focus { outline: none; }
+
+.loading-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 10rem;
+}
+
+pre { border-radius: 0.5rem; }
+
+.table-scroll { overflow-x: auto; }
+
+.hidden { display: none; }
+
+.disabled { opacity: 0.6; pointer-events: none; }
+
+.table-scroll { overflow: auto; max-height: 480px; }
+.loading-row { display:flex; align-items:center; justify-content:center; padding:24px; }
+button.disabled { opacity: 0.5; cursor: not-allowed; }
