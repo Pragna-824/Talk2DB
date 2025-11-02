@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_self">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Talk2DB - Natural Language to SQL Converter</title>
+  <meta name="description" content="Convert natural language queries to SQL with AI-powered interface"/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { primary:"#3B82F6", secondary:"#1E40AF", accent:"#10B981" } } }
+    }
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+  <!-- Header -->
+  <header class="bg-white shadow-lg">
+    <div class="container mx-auto px-4 py-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+            <i class="fas fa-database text-white text-lg"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-800">Talk2DB</h1>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <!-- Role toggle -->
+          <button id="btnRole" class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-blue-50 transition-colors">
+            <i class="fas fa-user-shield mr-2"></i><span id="roleLabel">Viewer</span>
+          </button>
+
+          <button id="btnHistory" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors">
+            <i class="fas fa-history mr-2"></i>Query History
+          </button>
+          <button id="btnSettings" class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-blue-50 transition-colors">
+            <i class="fas fa-cog mr-2"></i>Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <!-- Admin banner -->
+    <div id="adminBanner" class="hidden mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+      <i class="fas fa-exclamation-triangle mr-2"></i>
+      <strong>Admin mode:</strong> Mutating SQL is enabled for this session.
+    </div>
+
+    <!-- Database Selection -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Database Configuration</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            <i class="fas fa-database mr-2"></i>Select Database
+          </label>
+          <select id="databaseSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+            <option value="">Choose a database...</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            <i class="fas fa-table mr-2"></i>Select Table
+          </label>
+          <select id="tableSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+            <option value="">Choose a table...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Query Input -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Natural Language Query</h2>
+      <div class="relative">
+        <textarea id="queryInput" rows="4"
+          placeholder="Enter your query in plain English... Example: Show me all customers from New York in the CUSTOMERS table of SALES_DB"
+          class="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"></textarea>
+        <div class="absolute bottom-4 right-4 flex space-x-2">
+          <button id="btnClear" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors" title="Clear">
+            <i class="fas fa-eraser"></i>
+          </button>
+          <button id="submitQuery" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center">
+            <i class="fas fa-play mr-2"></i>Run Query
+          </button>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center text-sm text-gray-600">
+        <i class="fas fa-lightbulb mr-2 text-accent"></i>
+        <span>Tip: Mention table names and database names in CAPS for accurate SQL conversion</span>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-gray-800">Query Results</h2>
+        <div class="flex space-x-3">
+          <button id="btnExport" class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors" disabled>
+            <i class="fas fa-download mr-2"></i>Export
+          </button>
+        </div>
+      </div>
+
+      <div id="resultsContainer" class="border border-gray-200 rounded-lg min-h-[400px]">
+        <div class="flex flex-col items-center justify-center h-full py-16 text-gray-400">
+          <i class="fas fa-search text-4xl mb-4"></i>
+          <p class="text-lg">Your query results will appear here</p>
+          <p class="text-sm mt-2">Run a query to see the generated SQL and results</p>
+        </div>
+      </div>
+
+      <div id="sqlContainer" class="mt-6 hidden">
+        <h3 class="text-lg font-medium text-gray-800 mb-3">Generated SQL</h3>
+        <div class="bg-gray-800 rounded-lg p-4">
+          <pre class="text-green-400 text-sm overflow-x-auto" id="generatedSQL"></pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-gray-200 mt-12">
+    <div class="container mx-auto px-4 py-8">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="flex items-center space-x-3 mb-4 md:mb-0">
+          <div class="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+            <i class="fas fa-database text-white text-sm"></i>
+          </div>
+          <span class="text-gray-600 font-medium">Talk2DB</span>
+        </div>
+        <div class="text-sm text-gray-500">
+          <p>Convert natural language to SQL queries with AI-powered precision</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script defer src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
