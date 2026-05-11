@@ -1,4 +1,4 @@
-# 🐱 Talk2Db
+# Talk2Db
 
 > Chat with your database using natural language — powered by OpenAI.
 
@@ -6,17 +6,17 @@ Talk2Db lets you query SQLite databases through a simple conversational interfac
 
 ---
 
-## ✨ Features
+## Features
 
-- 💬 **Natural language queries** — No SQL knowledge required
-- 🤖 **OpenAI-powered** — Uses GPT to understand and translate your questions
-- 🗄️ **SQLite support** — Works with local `.db` files out of the box
-- 🌐 **Simple web UI** — Clean HTML interface to interact with your data
-- 🐳 **Docker-ready** — Easily containerized for deployment
+-  **Natural language queries** — No SQL knowledge required
+-  **OpenAI-powered** — Uses GPT to understand and translate your questions
+-  **SQLite support** — Works with local `.db` files out of the box
+-  **Simple web UI** — Clean HTML interface to interact with your data
+-  **Docker-ready** — Easily containerized for deployment
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
@@ -28,7 +28,7 @@ Talk2Db lets you query SQLite databases through a simple conversational interfac
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -64,7 +64,7 @@ Talk2Db lets you query SQLite databases through a simple conversational interfac
 
 ---
 
-## 💡 Usage
+##  Usage
 
 Once the app is running, you can ask questions like:
 
@@ -76,7 +76,7 @@ Talk2Db will convert your question into SQL, run it against the database, and re
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 Talk2Db/
@@ -93,7 +93,7 @@ Talk2Db/
 
 ---
 
-## 🐳 Running with Docker
+##  Running with Docker
 
 ```bash
 docker build -t talk2db .
@@ -102,7 +102,7 @@ docker run -p 5000:5000 talk2db
 
 ---
 
-## 🔑 Environment Variables
+##  Environment Variables
 
 | Variable | Description |
 |----------|-------------|
@@ -110,13 +110,13 @@ docker run -p 5000:5000 talk2db
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙋‍♀️ Author
+## Author
 
 **Pragna-824** — [GitHub Profile](https://github.com/Pragna-824)
 
